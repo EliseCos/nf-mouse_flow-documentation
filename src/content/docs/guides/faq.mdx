@@ -16,3 +16,15 @@ The Nextflow `-bg` flag launches Nextflow in the background, detached from your 
 
 Alternatively, you can use `screen` / `tmux` or similar tool to create a detached session which you can log back into at a later time.
 Some HPC setups also allow you to run nextflow within a cluster job submitted your job scheduler (from where it submits more jobs).
+
+### **Q: nf-mouse cannot detect the value of b0**
+
+If the following error is displayed, it means that the value of b0 is too high compared to the previously defined value:
+
+```diff
+-ValueError: The minimal bvalue (XXX) is above the b0 threshold (100.0).
+-No b0 volumes can be found.
+-Please check your data to ensure everything is correct.
+```
+
+By default, all values below 100 are considered possible values for b0. You can change this by adding this parameter `--b0_threshold=XXX` to your command.

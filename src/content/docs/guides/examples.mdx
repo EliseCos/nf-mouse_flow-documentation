@@ -18,3 +18,10 @@ By default, all steps will be executed. If you wish to disable some steps, you c
     { id: 'Tracking', label: "Tracking" },
   ]}
 />
+
+### **b0 threshold**
+Depending on the type of DWI data export, the b values can be either ideal or effective. When the values are effective, it is rare for b0 to be exactly equal to 0. By default, nf-mouse uses a threshold of 100: all values below 100 are therefore considered to be b0.
+If you are working with effective b0 values, it may be necessary to increase this threshold. To do so, simply add the following option `b0_threshold=XXX`. You can find more information on the [FAQ page](/nf-mouse/guides/faq).
+
+
+To know more about the modulated parameters please refer to the [parameters page](/nf-mouse/guides/parameters).
