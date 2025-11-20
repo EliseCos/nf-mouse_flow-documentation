@@ -31,11 +31,12 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Installation', slug: 'guides/installation' },
+						{ label: 'Prerequistes installation', slug: 'guides/installation' },
 						{ label: 'Inputs', slug: 'guides/inputs' },
-						{ label: 'Running the pipeline', slug: 'guides/usage' },
-						{ label: 'Running with no internet access', slug: 'guides/nointernet' },
+						{ label: 'Run the pipeline', slug: 'guides/usage' },
 						{ label: "Parameters", slug: 'guides/parameters' },
+						{ label: "Advanced users", slug: 'guides/advanced' },
+						{ label: 'No internet access', slug: 'guides/nointernet' },
 						{ label: 'Outputs', slug: 'guides/outputs' },
 						{ label: 'Frequently Asked Questions', slug: 'guides/faq' },
 					],

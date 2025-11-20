@@ -1,0 +1,333 @@
+---
+const { items = [] } = Astro.props;
+
+// Dynamically get version folders from docs
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+
+let versions = ['main'];
+try {
+  const docsPath = join(process.cwd(), 'src/content/docs');
+  const entries = await readdir(docsPath, { withFileTypes: true });
+  const versionFolders = entries
+    .filter(entry => entry.isDirectory() && /^\d/.test(entry.name))
+    .map(entry => entry.name)
+    .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
+  versions = ['main', ...versionFolders];
+} catch (error) {
+  console.error('Could not read version folders:', error);
+}
+---
+
+<div class="options-wrapper">
+  <div class="options-list">
+      <h5>Select nf-mouse release</h5>
+      <div>
+        <select id="version-select" name="version">
+          {versions.map((version) => (
+            <option value={version}>
+              {version === 'main' ? 'main (latest development)' : `v${version}`}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <h5 style="margin-top: 1.5rem;">Input and output directories</h5>
+      <div style="margin-bottom: 0.5rem;">
+        <label for="input-dir">Input directory:</label>
+        <input type="text" id="input-dir" name="input-dir" value="INPUT" style="width: 100%; max-width: 400px; padding: 0.4rem; margin-top: 0.2rem;" />
+      </div>
+      <div>
+        <label for="output-dir">Output directory:</label>
+        <input type="text" id="output-dir" name="output-dir" value="./results" style="width: 100%; max-width: 400px; padding: 0.4rem; margin-top: 0.2rem;" />
+      </div>
+
+      <h5 style="margin-top: 1.5rem;">Pipeline options</h5>
+      <div style="margin-bottom: 0.5rem;">
+        <label>
+          <input type="checkbox" id="use-preqc" name="use-preqc" />
+          Use pre-QC
+        </label>
+      </div>
+
+      <h5 style="margin-top: 1.5rem;">Skip processing steps</h5>
+        <ul>
+        {items.map((item) => (
+            <li>
+            <label>
+                <input type="checkbox" value={item.label} />
+                {item.label}
+            </label>
+            </li>
+        ))}
+        </ul>
+      
+      <h5 style="margin-top: 1.5rem;">Select execution profiles</h5>
+      <div>
+        <div style="margin-bottom: 0.5rem;">
+          <strong>Container engine (choose one):</strong>
+        </div>
+        <div style="margin-bottom: 0.5rem;">
+          <label>
+            <input type="radio" name="container" value="docker" checked />
+            Docker
+          </label>
+        </div>
+        <div style="margin-bottom: 0.5rem;">
+          <label>
+            <input type="radio" name="container" value="apptainer" />
+            Apptainer
+          </label>
+        </div>
+        
+        <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
+          <strong>Additional profiles:</strong>
+        </div>
+        <div style="margin-bottom: 0.3rem;">
+          <label>
+            <input type="checkbox" id="profile-preqc" value="run_preqc" />
+            run_preqc
+          </label>
+        </div>
+        <div style="margin-bottom: 0.3rem;">
+          <label>
+            <input type="checkbox" id="profile-slurm" value="slurm" />
+            slurm
+          </label>
+        </div>
+        <div style="margin-bottom: 0.3rem;">
+          <label>
+            <input type="checkbox" id="profile-gpu" value="gpu" />
+            gpu
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="summary" class="summary-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h5 style="margin: 0;"><strong>The executable command:</strong></h5>
+          <button id="copy-button" class="copy-button">Copy</button>
+        </div>
+        <p>
+        <code id="base-command">nextflow run scilus/nf-mouse -r <span id="version-placeholder">main</span> \
+    --input <span id="input-placeholder">INPUT</span> \
+    --outdir <span id="output-placeholder">./results</span> \
+    -profile <span id="profile-placeholder">docker,pre_qc</span> \
+    -resume</code>
+        </p>
+  </div>
+</div>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    // DOM elements
+    const checkboxes = document.querySelectorAll('.options-list ul input[type="checkbox"]');
+    const usePreqcCheckbox = document.getElementById('use-preqc');
+    const containerRadios = document.querySelectorAll('input[name="container"]');
+    const profilePreqc = document.getElementById('profile-preqc');
+    const profileSlurm = document.getElementById('profile-slurm');
+    const profileGpu = document.getElementById('profile-gpu');
+    const versionSelect = document.getElementById('version-select');
+    const inputDir = document.getElementById('input-dir');
+    const outputDir = document.getElementById('output-dir');
+    const summary = document.getElementById('summary');
+
+    // Command mapping for skip options
+    const commandMap = {
+      'Denoising': '--run_denoising false',
+      'Eddy current': '--run_eddy false',
+      'N4 correction': '--run_n4 false',
+      'Resampling': '--run_resampling false',
+      'Tracking': '--run_tracking false',
+    };
+
+    // Build command string
+    function buildCommand() {
+      const parts = [
+        `nextflow run scilus/nf-mouse -r ${versionSelect.value || 'main'}`,
+        `--input ${inputDir.value || 'INPUT'}`,
+        `--outdir ${outputDir.value || './results'}`,
+      ];
+
+      if (usePreqcCheckbox.checked) {
+        parts.push('--use_preqc true');
+      }
+
+      // Build profile list
+      const profiles = [];
+      const selectedContainer = document.querySelector('input[name="container"]:checked');
+      if (selectedContainer) {
+        profiles.push(selectedContainer.value);
+      }
+      if (profilePreqc.checked) profiles.push('run_preqc');
+      if (profileSlurm.checked) profiles.push('slurm');
+      if (profileGpu.checked) profiles.push('gpu');
+
+      parts.push(`-profile ${profiles.join(',')}`);
+
+      // Add skip options
+      const skipOptions = Array.from(checkboxes)
+        .filter(el => el.checked)
+        .map(el => commandMap[el.value])
+        .filter(Boolean);
+      
+      parts.push(...skipOptions);
+      parts.push('-resume');
+
+      return parts.join(' \\\n    ');
+    }
+
+    function updateSummary() {
+      const fullCommand = buildCommand();
+
+      summary.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h5 style="margin: 0;"><strong>The executable command:</strong></h5>
+          <button id="copy-button" class="copy-button">Copy</button>
+        </div>
+        <pre><code id="final-command">${fullCommand}</code></pre>
+      `;
+      
+      document.getElementById('copy-button').addEventListener('click', copyCommand);
+    }
+
+    function copyCommand() {
+      const commandText = document.getElementById('final-command').textContent;
+      navigator.clipboard.writeText(commandText).then(() => {
+        const btn = document.getElementById('copy-button');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.backgroundColor = '#4caf50';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.backgroundColor = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+    
+    // Load saved preferences
+    const saved = {
+      options: JSON.parse(localStorage.getItem('selectedOptions') || '[]'),
+      version: localStorage.getItem('selectedVersion') || 'main',
+      container: localStorage.getItem('selectedContainer') || 'docker',
+      profilePreqc: localStorage.getItem('profilePreqc') === 'true',
+      profileSlurm: localStorage.getItem('profileSlurm') === 'true',
+      profileGpu: localStorage.getItem('profileGpu') === 'true',
+      input: localStorage.getItem('selectedInput') || 'INPUT',
+      output: localStorage.getItem('selectedOutput') || './results',
+      usePreqc: localStorage.getItem('selectedUsePreqc') === 'true',
+    };
+
+    // Helper to add change listener
+    function addChangeListener(element, storageKey, callback) {
+      element.addEventListener('change', () => {
+        localStorage.setItem(storageKey, callback ? callback(element) : element.value);
+        updateSummary();
+      });
+    }
+
+    // Restore and setup checkboxes
+    checkboxes.forEach(el => {
+      if (saved.options.includes(el.value)) el.checked = true;
+      addChangeListener(el, 'selectedOptions', () => {
+        const selected = Array.from(checkboxes)
+          .filter(el => el.checked)
+          .map(el => el.value);
+        return JSON.stringify(selected);
+      });
+    });
+
+    // Restore and setup other controls
+    versionSelect.value = saved.version;
+    addChangeListener(versionSelect, 'selectedVersion');
+
+    containerRadios.forEach(radio => {
+      if (radio.value === saved.container) radio.checked = true;
+      addChangeListener(radio, 'selectedContainer');
+    });
+
+    profilePreqc.checked = saved.profilePreqc;
+    addChangeListener(profilePreqc, 'profilePreqc', el => el.checked);
+
+    profileSlurm.checked = saved.profileSlurm;
+    addChangeListener(profileSlurm, 'profileSlurm', el => el.checked);
+
+    profileGpu.checked = saved.profileGpu;
+    addChangeListener(profileGpu, 'profileGpu', el => el.checked);
+
+    inputDir.value = saved.input;
+    inputDir.addEventListener('input', () => {
+      localStorage.setItem('selectedInput', inputDir.value);
+      updateSummary();
+    });
+
+    outputDir.value = saved.output;
+    outputDir.addEventListener('input', () => {
+      localStorage.setItem('selectedOutput', outputDir.value);
+      updateSummary();
+    });
+
+    usePreqcCheckbox.checked = saved.usePreqc;
+    addChangeListener(usePreqcCheckbox, 'selectedUsePreqc', el => el.checked);
+
+    updateSummary();
+  });
+</script>
+
+<style>
+  .options-list {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+
+  .summary-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fff;
+  }
+
+  ul { list-style: none; padding: 0; }
+  li { margin: 0.3rem 0; }
+
+  select, input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    font-size: 1rem;
+  }
+
+  select {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .copy-button {
+    padding: 0.5rem 1rem;
+    background: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+  }
+
+  .copy-button:hover {
+    background: #005a9e;
+  }
+
+  code {
+    background: #eee;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    display: block;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+</style>
