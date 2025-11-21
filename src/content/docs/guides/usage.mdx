@@ -19,7 +19,6 @@ A pipeline like `nf-mouse` is highly flexible and configurable. To simplify usag
 without diving into every parameter, we created a set of profiles that regroup multiple variables.
 :::
 
-
 That said, here are some important parameters you might find useful.
 ### Parameters
 
@@ -28,7 +27,11 @@ That said, here are some important parameters you might find useful.
 
      By selecting this parameter and combined with the profile `run_preqc`, you will use the output of a combination of checks and validations steps to insure your images and bvecs are oriented correctly.
 
-  2. **`--run_step`**
+  2. **`--use_fodf_for_tracking`**
+
+     By selecting this parameter, tracking will be carried out using the FODF reconstruction.
+
+  3. **`--run_step`**
 
      Each preprocessing step of `nf-mouse` can be skipped. You can deactivate a specific step by adding ```--run_STEP false```. Here are the following steps that can be disabled: denoising, eddy, n4, resampling,
 
