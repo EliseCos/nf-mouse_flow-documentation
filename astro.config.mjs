@@ -21,8 +21,8 @@ export default defineConfig({
 				}),
 			],
 			logo: {
-				light: './src/assets/logo_white.png',
-				dark: './src/assets/logo_dark.png',
+				light: './src/assets/nf-mouse-light-logo.png',
+				dark: './src/assets/nf-mouse-dark-logo.png',
 				replacesTitle: false,
 			},
 			social: [{ icon: 'github', label: 'nf-mouse', href: 'https://github.com/scilus/nf-mouse' }],
@@ -31,11 +31,12 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Installation', slug: 'guides/installation' },
+						{ label: 'Prerequistes installation', slug: 'guides/installation' },
 						{ label: 'Inputs', slug: 'guides/inputs' },
-						{ label: 'Running the pipeline', slug: 'guides/usage' },
-						{ label: 'Running with no internet access', slug: 'guides/nointernet' },
+						{ label: 'Run the pipeline', slug: 'guides/usage' },
 						{ label: "Parameters", slug: 'guides/parameters' },
+						{ label: "Advanced users", slug: 'guides/advanced' },
+						{ label: 'No internet access', slug: 'guides/nointernet' },
 						{ label: 'Outputs', slug: 'guides/outputs' },
 						{ label: 'Frequently Asked Questions', slug: 'guides/faq' },
 					],
