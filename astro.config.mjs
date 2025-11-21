@@ -21,8 +21,8 @@ export default defineConfig({
 				}),
 			],
 			logo: {
-				light: './src/assets/logo_white.png',
-				dark: './src/assets/logo_dark.png',
+				light: './src/assets/nf-mouse-light-logo.png',
+				dark: './src/assets/nf-mouse-dark-logo.png',
 				replacesTitle: false,
 			},
 			social: [{ icon: 'github', label: 'nf-mouse', href: 'https://github.com/scilus/nf-mouse' }],
