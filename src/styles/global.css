@@ -27,3 +27,12 @@ pre {
   border-radius: 6px;
   overflow-x: auto;
 }
+
+.centered {
+  text-align: center;
+}
+
+.centered img {
+  display: inline-block;
+  max-width: 100%;
+}
