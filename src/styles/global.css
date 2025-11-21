@@ -21,13 +21,6 @@
     --color-gray-900: #141a14;
 }
 
-pre {
-  background: #eee;
-  padding: 0.8rem;
-  border-radius: 6px;
-  overflow-x: auto;
-}
-
 .centered {
   text-align: center;
 }

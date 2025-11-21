@@ -49,6 +49,12 @@ try {
           Use pre-QC
         </label>
       </div>
+      <div style="margin-bottom: 0.5rem;">
+        <label>
+          <input type="checkbox" id="use-fodf-for-tracking" name="use-fodf-for-tracking" />
+          Use fODF for tracking
+        </label>
+      </div>
 
       <h5 style="margin-top: 1.5rem;">Skip processing steps</h5>
         <ul>
@@ -124,6 +130,7 @@ try {
     // DOM elements
     const checkboxes = document.querySelectorAll('.options-list ul input[type="checkbox"]');
     const usePreqcCheckbox = document.getElementById('use-preqc');
+    const useFodfForTrackingCheckbox = document.getElementById('use-fodf-for-tracking');
     const containerRadios = document.querySelectorAll('input[name="container"]');
     const profilePreqc = document.getElementById('profile-preqc');
     const profileSlurm = document.getElementById('profile-slurm');
@@ -152,6 +159,10 @@ try {
 
       if (usePreqcCheckbox.checked) {
         parts.push('--use_preqc true');
+      }
+
+      if (useFodfForTrackingCheckbox.checked) {
+        parts.push('--use_fodf_for_tracking true');
       }
 
       // Build profile list
@@ -219,6 +230,7 @@ try {
       input: localStorage.getItem('selectedInput') || 'INPUT',
       output: localStorage.getItem('selectedOutput') || './results',
       usePreqc: localStorage.getItem('selectedUsePreqc') === 'true',
+      useFodfForTracking: localStorage.getItem('selectedUseFodfForTracking') === 'true',
     };
 
     // Helper to add change listener
@@ -273,61 +285,9 @@ try {
     usePreqcCheckbox.checked = saved.usePreqc;
     addChangeListener(usePreqcCheckbox, 'selectedUsePreqc', el => el.checked);
 
+    useFodfForTrackingCheckbox.checked = saved.useFodfForTracking;
+    addChangeListener(useFodfForTrackingCheckbox, 'selectedUseFodfForTracking', el => el.checked);
+
     updateSummary();
   });
 </script>
-
-<style>
-  .options-list {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    border-radius: 8px;
-    background: #f9f9f9;
-  }
-
-  .summary-box {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #fff;
-  }
-
-  ul { list-style: none; padding: 0; }
-  li { margin: 0.3rem 0; }
-
-  select, input[type="text"] {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    font-size: 1rem;
-  }
-
-  select {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .copy-button {
-    padding: 0.5rem 1rem;
-    background: #007acc;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s;
-  }
-
-  .copy-button:hover {
-    background: #005a9e;
-  }
-
-  code {
-    background: #eee;
-    padding: 0.4rem 0.6rem;
-    border-radius: 4px;
-    display: block;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-</style>
