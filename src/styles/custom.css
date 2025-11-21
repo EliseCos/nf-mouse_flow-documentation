@@ -113,6 +113,12 @@
 	white-space: nowrap;
 }
 
+/* Prevent Parameter column from wrapping in parameter tables */
+.sl-markdown-content table td:nth-child(1),
+.sl-markdown-content table th:nth-child(1) {
+	white-space: nowrap;
+}
+
 /* Hide the Hidden column (6th column) in parameter tables */
 .sl-markdown-content table td:nth-child(6),
 .sl-markdown-content table th:nth-child(6) {
