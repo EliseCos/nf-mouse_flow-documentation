@@ -59,7 +59,7 @@ jobs:
           echo 'title: Pipeline Parameters' | cat - parameters.md > temp && mv temp parameters.md
           echo '---' | cat - parameters.md > temp && mv temp parameters.md
           sed -E -i 's/^## (.*)$/### **\1**/' parameters.md
-          sed -E -i '/^# scilus\/nf-mouse pipeline parameters$/,/^nf-mouse is a neuroimaging pipeline to process ex-vivo mouse diffusion MRI data\.$/d' parameters.md
+          sed -E -i '/^# scilus\/nf-mouse pipeline parameters$/,/^nf-mouse is a neuroimaging pipeline to process ex-vivo dMRI data\.$/d' parameters.md
 
       - name: Pack into artifacts
         uses: actions/upload-artifact@v4
