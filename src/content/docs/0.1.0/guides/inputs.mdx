@@ -4,27 +4,15 @@ description: nf-mouse inputs
 slug: 0.1.0/guides/inputs
 ---
 
-import { FileTree } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
-### **Basic input directory**
+### **Q: Can I make the pipeline run in the background?**
 
-`nf-mouse` only needs diffusion MRI images. The input structure should look like this:
+**A. Yes**
 
-<FileTree>
-  * input\_directory
-    * sub-01
-      * sub-01\_dwi.nii.gz
-      * sub-01\_dwi.bval
-      * sub-01\_dwi.bvec
-    * sub-02
-      * sub-02\_dwi.nii.gz
-      * sub-02\_dwi.bval
-      * sub-02\_dwi.bvec
-</FileTree>
+Nextflow handles job submissions and supervises the running jobs. The Nextflow process must run until the pipeline is finished.
 
-### **BIDS input directory** (In development)
+The Nextflow `-bg` flag launches Nextflow in the background, detached from your terminal so that the workflow does not stop if you log out of your session. The logs are saved to a file.
 
-The [BIDS (Brain Imaging Data Structure)](https://bids-specification.readthedocs.io/en/stable/) input directory is a standardized way to organize and describe neuroimaging and behavioral data. The nf-mouse pipeline expects the input data to be organized in the BIDS format. Good resources to convert your raw DICOMs files in a BIDS structure include [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/) and/or [heudiconv](https://heudiconv.readthedocs.io/en/latest/). It is recommended that users validate their BIDS layout using the official [bids-validator tool](https://hub.docker.com/r/bids/validator) docker image or the [web-based version](https://bids-standard.github.io/bids-validator/).
-
-`nf-mouse` will soon be BIDS compatible.
-
+Alternatively, you can use `screen` / `tmux` or similar tool to create a detached session which you can log back into at a later time.
+Some HPC setups also allow you to run nextflow within a cluster job submitted your job scheduler (from where it submits more jobs).
